@@ -141,12 +141,12 @@ if __name__ == "__main__":
 
     print("\nFinal Link Flows:")
     for link, flow in final_flows.items():
-        print(f"Link {G.edges[link]['link_id']}: {flow:.2f} vehicles")
+        print(f"Link {G.edges[link]['link_id']}: {flow:.2f} Vehicles")
 
     print("\nTravel Times:")
     for link, time in travel_times.items():
-        print(f"Link {G.edges[link]['link_id']}: {time:.2f} minutes")
+        print(f"Link {G.edges[link]['link_id']}: {time:.2f} Minutes")
 
-    print(f"\nShortest Path Travel Time (SPTT): {sptt:.2f} vehicle-minutes")
-    print(f"Total System Travel Time (TSTT): {total_tstt:.2f} vehicle-minutes")
+    print(f"\nShortest Path Travel Time (SPTT): {sptt:.2f} Vehicle-Minutes")
+    print(f"Total System Travel Time (TSTT): {total_tstt:.2f} Vehicle-Minutes")
     print(f"Relative Gap: {relative_gap:.6f}")
