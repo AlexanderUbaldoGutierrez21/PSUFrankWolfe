@@ -110,7 +110,7 @@ def frank_wolfe(G, od_pairs, paths, max_iter=1000, gamma=0.001, lambda_thresh=0.
         # CHECK CONVERGENCE
         max_rel_change = max(abs(x_new[edge] - x[edge]) / (x[edge] + 1e-6) for edge in G.edges)
         if max_rel_change < lambda_thresh or relative_gap < gamma:
-            print(f"Converged at iteration {iteration+1}, max rel change: {max_rel_change}, relative gap: {relative_gap}")
+            print(f"Converged At Iteration {iteration+1}, Max Rel Change: {max_rel_change}, Relative GAP: {relative_gap}")
             break
 
         x = x_new
@@ -125,7 +125,7 @@ if __name__ == "__main__":
     G, links = parse_network('CE521_H2Nodes.csv')
     paths = get_paths(G, od_pairs)
 
-    print("Network parsed:")
+    print("Network Parsed:")
     print(f"Nodes: {list(G.nodes)}")
     print(f"Links: {links}")
     print(f"OD Pairs: {od_pairs}")
