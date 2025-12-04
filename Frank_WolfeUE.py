@@ -42,10 +42,7 @@ def get_paths(G, od_pairs):
 def all_or_nothing(G, od_pairs, paths):
     link_flows = {link: 0.0 for link in G.edges}
     for (o, d), demand in od_pairs.items():
-        
-        # COMPUTE SHORTEST PATH BASED ON FREE-FLOW COSTS 
-        costs = {edge: link_cost(0) for edge in G.edges}
-        nx.set_edge_attributes(G, costs, 'cost')
+
         try:
             path = nx.shortest_path(G, o, d, weight='cost')
             path_edges = list(zip(path[:-1], path[1:]))
@@ -84,21 +81,17 @@ def frank_wolfe(G, od_pairs, paths, max_iter=1000, gamma=0.001, lambda_thresh=0.
         # AUXILIARY FLOWS (ALL-OR-NOTHING ON CURRENT COSTS)
         y = all_or_nothing(G, od_pairs, paths)
 
-        numerator = 0
-        denominator = 0
-        for edge in G.edges:
-            xi = x[edge]
-            yi = y[edge]
-            ci_x = link_cost(xi)
-            ci_y = link_cost(yi)
-            numerator += (xi - yi) * (ci_x - ci_y)
-            denominator += (xi - yi)**2 * (1/120)
-
-        if denominator == 0:
-            alpha = 1
-        else:
-            alpha = numerator / denominator
-            alpha = max(0, min(1, alpha))
+        # LINE SEARCH FOR ALPHA
+        alphas = [i/20 for i in range(21)]  # 0 to 1 step 0.05
+        best_alpha = 0
+        best_obj = sum(link_cost(flow) * flow for flow in x.values())
+        for a in alphas:
+            flows_a = {edge: (1-a)*x[edge] + a*y[edge] for edge in G.edges}
+            obj_a = sum(link_cost(f) * f for f in flows_a.values())
+            if obj_a < best_obj:
+                best_obj = obj_a
+                best_alpha = a
+        alpha = best_alpha
 
         # UPDATE FLOWS
         x_new = {edge: (1 - alpha) * x[edge] + alpha * y[edge] for edge in G.edges}
@@ -116,7 +109,7 @@ def frank_wolfe(G, od_pairs, paths, max_iter=1000, gamma=0.001, lambda_thresh=0.
         x = x_new
 
         if iteration % 100 == 0:
-            print(f"Iteration {iteration+1}, max rel change: {max_rel_change}, relative gap: {relative_gap}")
+            print(f"Iteration {iteration+1}, Max Rel Change: {max_rel_change}, Relative Gap: {relative_gap}")
 
     return x, sptt
 
@@ -124,6 +117,10 @@ def frank_wolfe(G, od_pairs, paths, max_iter=1000, gamma=0.001, lambda_thresh=0.
 if __name__ == "__main__":
     G, links = parse_network('CE521_H2Nodes.csv')
     paths = get_paths(G, od_pairs)
+
+    # SET INITIAL COSTS TO FREE-FLOW
+    costs = {edge: link_cost(0) for edge in G.edges}
+    nx.set_edge_attributes(G, costs, 'cost')
 
     print("Network Parsed:")
     print(f"Nodes: {list(G.nodes)}")
@@ -133,6 +130,12 @@ if __name__ == "__main__":
 
     # RUN FRANK-WOLFE
     final_flows, sptt = frank_wolfe(G, od_pairs, paths, gamma=0.001, lambda_thresh=0.001)
+
+    print("\nInitial Assignment (Free-Flow):")
+    initial_flows = all_or_nothing(G, od_pairs, paths)
+    initial_times = {edge: link_cost(flow) for edge, flow in initial_flows.items()}
+    for link, flow in initial_flows.items():
+        print(f"Link {G.edges[link]['link_id']}: {flow:.2f} Vehicles, Time: {initial_times[link]:.2f} Minutes")
 
     # COMPUTE TRAVEL TIMES AND TOTAL SYSTEM TRAVEL TIME
     travel_times = {edge: link_cost(flow) for edge, flow in final_flows.items()}
