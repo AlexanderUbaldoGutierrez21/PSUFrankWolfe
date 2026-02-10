@@ -1,6 +1,4 @@
-# PSUFrankWolfe
-
-## Description
+# Frank Wolfe Algorithm for User Equilibrium (UE)
 This project implements the Frank-Wolfe algorithm to solve User Equilibrium (UE) problems in transportation networks. It parses network data from a CSV file, computes shortest paths, and iteratively finds equilibrium link flows using all-or-nothing assignments and line search for convergence.
 
 ## Usage
