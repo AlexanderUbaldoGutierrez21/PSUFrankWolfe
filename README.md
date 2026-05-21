@@ -7,5 +7,5 @@ Terminal MAC Run Script
 python3 Frank_WolfeUE.py
 ```
 
-## Academic Purposes
+## Research Purposes
 This code is designed for educational purposes to demonstrate the Frank-Wolfe algorithm in transportation engineering, focusing on algorithmic clarity rather than optimized performance for large-scale networks.Penn State University (PSU), CE 521 Transportation Network and Systems Analysis. Fall 2025.
